@@ -1,6 +1,6 @@
 from rest_framework import serializers
-
-from blog.models import Category, Post, Comment
+from django.contrib.auth.models import User
+from .models import Category, Post, Comment
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -50,3 +50,9 @@ class PostSerializer(serializers.ModelSerializer):
             'comments',
             'category',
         )
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ['url', 'username', 'email', 'groups']

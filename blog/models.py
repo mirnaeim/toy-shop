@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -30,6 +31,7 @@ class Category(MyBaseModel):
 
 
 class Post(MyBaseModel):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=250, null=False, blank=False, verbose_name='Title')
     description = models.TextField(null=False, blank=False, verbose_name='Description')
     category = models.ForeignKey(Category, null=False, blank=False, on_delete=models.PROTECT,
