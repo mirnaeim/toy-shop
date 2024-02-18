@@ -16,4 +16,4 @@ class PostAdmin(admin.ModelAdmin):
 
 @register(Comment)
 class CommentsAdmin(admin.ModelAdmin):
-    list_display = ('id', 'content', 'post')
+    list_display = ('id', 'author', 'post')
