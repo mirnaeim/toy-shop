@@ -30,8 +30,6 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = Post.objects.all()
         post = get_object_or_404(queryset, pk=pk)
         serializer = PostRetrieveSerializer(post)
-        print(request.user)
-        print(request.auth)
         return Response(serializer.data)
 
     def perform_create(self, serializer):
