@@ -21,4 +21,3 @@ urlpatterns = [
     path('comments/', include(comment_router.urls)),
     path('users/', include(user_router.urls)),
 ]
-

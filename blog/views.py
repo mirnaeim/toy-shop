@@ -2,9 +2,10 @@ from rest_framework import viewsets, filters, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Post, Category, Comment, User
-from .serializers import CategorySerializer, PostSerializer, PostRetrieveSerializer, CommentSerializer, UserSerializer
+from .serializers import (CategorySerializer, PostSerializer, PostRetrieveSerializer,
+                          CommentSerializer, UserSerializer, CustomTokenObtainPairSerializer)
 from .permissions import IsOwnerOrReadOnly
 # Create your views here.
 
@@ -12,15 +13,19 @@ from .permissions import IsOwnerOrReadOnly
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all().order_by('pk')
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter,)
+
+    def perform_create(self, serializer):
+        # Assign the current user to the author field of the post
+        serializer.save(author=self.request.user)
 
 
 class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     queryset = Post.objects.all().order_by('-pk')
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
     filterset_fields = ('id', 'category',)
@@ -40,7 +45,7 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         # Assign the current user to the author field of the post
@@ -54,3 +59,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     # permission_classes = [permissions.IsAdminUser]
+
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer

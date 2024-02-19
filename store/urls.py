@@ -13,4 +13,3 @@ urlpatterns = [
     path('categories/', include(category_router.urls)),
     path('products/', include(product_router.urls)),
 ]
-

@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 
+
 class MyBaseModel(models.Model):
     is_active = models.BooleanField(default=False, verbose_name='Is active',)
     created_date = models.DateTimeField(auto_now_add=True, verbose_name='Created Date',)
