@@ -2,9 +2,10 @@ from rest_framework import viewsets, filters, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-
+from rest_framework_simplejwt.views import TokenObtainPairView
 from .models import Post, Category, Comment, User
-from .serializers import CategorySerializer, PostSerializer, PostRetrieveSerializer, CommentSerializer, UserSerializer
+from .serializers import (CategorySerializer, PostSerializer, PostRetrieveSerializer,
+                          CommentSerializer, UserSerializer, CustomTokenObtainPairSerializer)
 from .permissions import IsOwnerOrReadOnly
 # Create your views here.
 
@@ -58,3 +59,8 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     # permission_classes = [permissions.IsAdminUser]
+
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
