@@ -18,6 +18,7 @@ class MyBaseModel(models.Model):
 
 
 class Category(MyBaseModel):
+    author = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
     title = models.CharField(max_length=255, null=False, blank=False, verbose_name='Title')
     description = models.TextField(null=False, blank=False, verbose_name='Description')
 

@@ -12,15 +12,19 @@ from .permissions import IsOwnerOrReadOnly
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all().order_by('pk')
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter,)
+
+    def perform_create(self, serializer):
+        # Assign the current user to the author field of the post
+        serializer.save(author=self.request.user)
 
 
 class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     queryset = Post.objects.all().order_by('-pk')
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
     filterset_fields = ('id', 'category',)
@@ -30,8 +34,6 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = Post.objects.all()
         post = get_object_or_404(queryset, pk=pk)
         serializer = PostRetrieveSerializer(post)
-        print(request.user)
-        print(request.auth)
         return Response(serializer.data)
 
     def perform_create(self, serializer):
@@ -42,7 +44,7 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         # Assign the current user to the author field of the post
