@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Category, Product
+from .models import Category, Product, Comment, Price
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -15,14 +15,31 @@ class CategorySerializer(serializers.ModelSerializer):
         )
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    # TODO user or product serializers, to not include or include and with read_only
+    class Meta:
+        model = Comment
+        fields = (
+            'product',
+            'content',
+        )
+
+
+class PriceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Price
+        fields = ('id', 'product', 'value')
+
+
 class ProductSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
+    prices = PriceSerializer()  # Allow prices to be provided
 
     class Meta:
         model = Product
-        fields = (
-            'id',
-            'name',
-            'detail',
-            'category',
-        )
+        fields = ('id', 'name', 'detail', 'category', 'prices')  # Add more fields if needed
+
+    def create(self, validated_data):
+        price = validated_data.pop('prices')
+        product = Product.objects.create(**validated_data)
+        Price.objects.create(product=product, **price)
+        return product

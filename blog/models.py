@@ -48,9 +48,11 @@ class Post(MyBaseModel):
 
 
 class Comment(MyBaseModel):
-    author = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments', verbose_name='Post')
-    content = models.TextField(verbose_name='Content')
+    author = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE, related_name='comments',
+                               verbose_name='Author')
+    post = models.ForeignKey(Post, null=False, blank=False, on_delete=models.CASCADE, related_name='comments',
+                             verbose_name='Post')
+    content = models.TextField(null=False, blank=False, verbose_name='Content')
 
     class Meta:
         verbose_name = 'Comment'

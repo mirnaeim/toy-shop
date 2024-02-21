@@ -1,8 +1,8 @@
 from rest_framework import viewsets, filters
-# from rest_framework import permissions
+from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Product, Category
+from .models import Product, Category, Price
 from .serializers import CategorySerializer, ProductSerializer
 # Create your views here.
 
@@ -21,5 +21,3 @@ class ProductViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter)
     filterset_fields = ('id', 'category',)
     search_fields = ('title', 'description',)
-
-# Create your views here.

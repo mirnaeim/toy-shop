@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
@@ -32,9 +33,8 @@ class Category(MyBaseModel):
 class Product(MyBaseModel):
     name = models.CharField(max_length=250, null=False, blank=False, verbose_name='Name')
     detail = models.TextField(null=False, blank=False, verbose_name='Detail')
-    price = models.CharField(max_length=255, null=False, blank=False, verbose_name='price')
     category = models.ForeignKey(Category, null=False, blank=False, on_delete=models.PROTECT,
-                                 related_name='posts', verbose_name='Category')
+                                 related_name='products', verbose_name='Category')
 
     class Meta:
         verbose_name = 'Product'
@@ -43,3 +43,31 @@ class Product(MyBaseModel):
 
     def __str__(self):
         return self.name
+
+    @property
+    def price(self):
+        return self.prices.filter(is_active=True).last()
+
+
+class Comment(MyBaseModel):
+    # Just because of a conflict on User.comments on two blog and store apps we are forced to use another related_name
+    # that is 'remarks', for author field in store.blog model
+    author = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE, related_name='remarks',
+                               verbose_name='Author')
+    product = models.ForeignKey(Product, null=False, blank=False, on_delete=models.CASCADE, related_name='comments',
+                                verbose_name='Products')
+    content = models.TextField(null=False, blank=False, verbose_name='Content')
+
+    class Meta:
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return f'{self.content} Commented by {self.author.username}'
+
+
+class Price(MyBaseModel):
+    product = models.ForeignKey(Product, null=False, blank=False, on_delete=models.CASCADE,
+                                related_name='prices', verbose_name='Product')
+    value = models.PositiveBigIntegerField(null=False, blank=False, verbose_name='Value')
