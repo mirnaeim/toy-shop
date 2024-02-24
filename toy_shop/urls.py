@@ -18,9 +18,10 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from blog.views import CustomTokenObtainPairView
+from django.conf import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path(f'{settings.ADMIN_PANEL_PATH}/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('blog/', include('blog.urls')),
     path('store/', include('store.urls')),

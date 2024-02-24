@@ -46,28 +46,62 @@ class Product(MyBaseModel):
 
     @property
     def price(self):
-        return self.prices.filter(is_active=True).last()
+        return self.prices.filter(is_active=True).first().value
 
+    def media(self):
+        return self.product_media.filter(is_active=True).all()
 
-class Comment(MyBaseModel):
-    # Just because of a conflict on User.comments on two blog and store apps we are forced to use another related_name
-    # that is 'remarks', for author field in store.blog model
-    author = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE, related_name='remarks',
-                               verbose_name='Author')
-    product = models.ForeignKey(Product, null=False, blank=False, on_delete=models.CASCADE, related_name='comments',
-                                verbose_name='Products')
-    content = models.TextField(null=False, blank=False, verbose_name='Content')
+    def images(self):
+        return self.product_media.filter(is_active=True, media_type='image').all()
 
-    class Meta:
-        verbose_name = 'Comment'
-        verbose_name_plural = 'Comments'
-        ordering = ('-created_date',)
+    def videos(self):
+        return self.product_media.filter(is_active=True, media_type='video').all()
 
-    def __str__(self):
-        return f'{self.content} Commented by {self.author.username}'
+    def audios(self):
+        return self.product_media.filter(is_active=True, media_type='audio').all()
 
 
 class Price(MyBaseModel):
     product = models.ForeignKey(Product, null=False, blank=False, on_delete=models.CASCADE,
                                 related_name='prices', verbose_name='Product')
-    value = models.PositiveBigIntegerField(null=False, blank=False, verbose_name='Value')
+    value = models.PositiveBigIntegerField(blank=False, null=False, verbose_name='Value')
+
+    class Meta:
+        verbose_name = 'Price'
+        verbose_name_plural = 'Prices'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return f'{self.value} $'
+
+
+class Review(MyBaseModel):
+    author = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE, related_name='reviews',
+                               verbose_name='Author')
+    product = models.ForeignKey(Product, null=False, blank=False, on_delete=models.CASCADE, related_name='reviews',
+                                verbose_name='Products')
+    content = models.TextField(null=False, blank=False, verbose_name='Content')
+
+    class Meta:
+        verbose_name = 'Review'
+        verbose_name_plural = 'Reviews'
+
+    def __str__(self):
+        return f'{self.content}'
+
+
+class ProductMedia(MyBaseModel):
+    MEDIA_TYPE_CHOICES = (
+        ('image', 'Image'),
+        ('video', 'Video'),
+        ('audio', 'Audio'),
+
+    )
+
+    product = models.ForeignKey(Product, null=False, blank=False, on_delete=models.CASCADE,
+                                related_name='product_media', verbose_name='Products')
+    media_type = models.CharField(max_length=6, choices=MEDIA_TYPE_CHOICES)
+    media_file = models.FileField(upload_to='store/product/')
+
+    def __str__(self):
+        return self.product.name

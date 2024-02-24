@@ -141,3 +141,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
 }
+
+ADMIN_PANEL_PATH = 'manager'

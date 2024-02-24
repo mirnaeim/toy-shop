@@ -61,6 +61,5 @@ class UserViewSet(viewsets.ModelViewSet):
     # permission_classes = [permissions.IsAdminUser]
 
 
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer

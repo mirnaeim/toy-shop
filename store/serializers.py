@@ -1,6 +1,13 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Category, Product, Comment, Price
+from .models import Category, Product, Price, Review, ProductMedia
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -10,16 +17,17 @@ class CategorySerializer(serializers.ModelSerializer):
             'id',
             'title',
             'description',
-            'created_date',
-            'updated_date',
         )
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    # TODO user or product serializers, to not include or include and with read_only
+class ReviewSerializer(serializers.ModelSerializer):
+    author = UserSerializer(read_only=True)
+
     class Meta:
-        model = Comment
+        model = Review
         fields = (
+            'id',
+            'author',
             'product',
             'content',
         )
@@ -28,18 +36,33 @@ class CommentSerializer(serializers.ModelSerializer):
 class PriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Price
-        fields = ('id', 'product', 'value')
+        fields = (
+            'value',
+        )
+
+
+class MediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductMedia
+        fields = (
+            'id',
+            'media_type',
+            'media_file',
+        )
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    prices = PriceSerializer()  # Allow prices to be provided
+    reviews = ReviewSerializer(many=True)
+    media = MediaSerializer(many=True)
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'detail', 'category', 'prices')  # Add more fields if needed
-
-    def create(self, validated_data):
-        price = validated_data.pop('prices')
-        product = Product.objects.create(**validated_data)
-        Price.objects.create(product=product, **price)
-        return product
+        fields = (
+            'id',
+            'category',
+            'name',
+            'detail',
+            'price',
+            'reviews',
+            'media',
+            )
