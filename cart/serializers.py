@@ -28,9 +28,10 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = (
             'id',
+            'is_paid',
+            'get_total_cost',
             'customer',
             'order_items',
-            'is_payed'
         )
 
 

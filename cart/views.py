@@ -1,4 +1,5 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import viewsets
@@ -7,20 +8,21 @@ from rest_framework import permissions
 from .models import Cart, OrderItem
 from store.models import Product
 from .serializers import CartSerializer
-from django.contrib.auth.decorators import login_required
 
 
 class CartViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    A ViewSet for viewing and editing cart instances.
+    A ViewSet for viewing cart instances.
     """
     serializer_class = CartSerializer
-    queryset = Cart.objects.all()
+
+    def get_queryset(self):
+        customer = self.request.user
+        return Cart.objects.filter(customer=customer, is_paid=False)
 
 
 @api_view()
-@login_required(login_url='/api-auth/login/')
-@permission_classes((permissions.AllowAny,))
+@permission_classes((permissions.IsAuthenticated,))
 def add_to_cart(request, product_id, quantity):
     queryset = Product.objects.all()
     product = get_object_or_404(queryset, id=product_id)
@@ -46,7 +48,7 @@ def add_to_cart(request, product_id, quantity):
 
 
 def check_cart(customer):
-    cart = Cart.objects.filter(customer=customer, is_payed=False).first()
+    cart = Cart.objects.filter(customer=customer, is_paid=False).first()
     if cart:
         print("Has Cart")
     else:

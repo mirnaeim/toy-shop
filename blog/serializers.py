@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Category, Post, Comment
+from .models import Category, Post, Comment, PostMedia
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
@@ -46,10 +46,21 @@ class CommentSerializer(serializers.ModelSerializer):
         )
 
 
+class MediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostMedia
+        fields = (
+            'id',
+            'media_type',
+            'media_file',
+        )
+
+
 class PostRetrieveSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
     comments = CommentSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
+    media = MediaSerializer(many=True)
 
     class Meta:
         model = Post
@@ -60,6 +71,7 @@ class PostRetrieveSerializer(serializers.ModelSerializer):
             'comments',
             'category',
             'author',
+            'media',
         )
 
 

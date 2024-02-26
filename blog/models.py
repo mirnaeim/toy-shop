@@ -46,6 +46,19 @@ class Post(MyBaseModel):
     def __str__(self):
         return self.title
 
+    def media(self):
+        return self.post_media.filter(is_active=True).all()
+
+    def images(self):
+        return self.post_media.filter(is_active=True, media_type='image').all()
+
+    def videos(self):
+        return self.post_media.filter(is_active=True, media_type='video').all()
+
+    def audios(self):
+        return self.post_media.filter(is_active=True, media_type='audio').all()
+
+
 
 class Comment(MyBaseModel):
     author = models.ForeignKey(User, null=False, blank=False, on_delete=models.CASCADE, related_name='comments',
@@ -61,3 +74,20 @@ class Comment(MyBaseModel):
 
     def __str__(self):
         return f'{self.content} Commented by {self.author.username}'
+
+
+class PostMedia(MyBaseModel):
+    MEDIA_TYPE_CHOICES = (
+        ('image', 'Image'),
+        ('video', 'Video'),
+        ('audio', 'Audio'),
+
+    )
+
+    product = models.ForeignKey(Post, null=False, blank=False, on_delete=models.CASCADE,
+                                related_name='post_media', verbose_name='Posts')
+    media_type = models.CharField(max_length=6, choices=MEDIA_TYPE_CHOICES)
+    media_file = models.FileField(upload_to='blog/post/')
+
+    def __str__(self):
+        return self.product.title

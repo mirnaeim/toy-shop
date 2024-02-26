@@ -4,7 +4,7 @@ from rest_framework import routers
 from .views import add_to_cart, CartViewSet
 
 cart_router = routers.DefaultRouter()
-cart_router.register('', CartViewSet,)
+cart_router.register('', CartViewSet, basename='')
 
 
 urlpatterns = [
